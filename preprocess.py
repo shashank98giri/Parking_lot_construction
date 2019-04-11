@@ -1,9 +1,11 @@
 from skimage.io import imread
 from skimage.filters import threshold_otsu
 from skimage import measure
+from skimage.transform import resize
 import matplotlib.patches as patches
 import plotting
 import numpy as np
+import matplotlib.pyplot as plt
 
 class Preprocess():
     def __init__(self,image_path):
@@ -22,7 +24,6 @@ class Preprocess():
     # sum of pixels in plate greater than 60 % of total pixels
     # only 10 cc in actual plate
    
-
 
     def plate_detection(self):    
         label_image = measure.label(self.binary_car_image)
@@ -47,7 +48,7 @@ class Preprocess():
                 
                 rectBorder = patches.Rectangle((minCol, minRow), maxCol-minCol, maxRow-minRow, edgecolor="red", linewidth=2, fill=False)
                 self.lp_cands.append(candidate)
-                self.lp_cand_dimension.append((minRow,minCol))
+                self.lp_cand_dimension.append(((minRow,minCol),(maxRow-minRow,maxCol-minCol)))
                 plotting.add_borders(rectBorder,self.fig,self.axis) 
 
     def elimininate_candidate(self,candidate):
@@ -71,9 +72,11 @@ class Preprocess():
             cnt=0
             border=[]
             temp_chars=[]
-            for region in measure.regionprops(labelled_cand):            
+            for region in measure.regionprops(labelled_cand):                         
                 minRow, minCol, maxRow, maxCol = region.bbox        
                 (region_height,region_width)=(maxRow-minRow,maxCol-minCol)
+                if(maxRow==self.lp_cand_dimension[idx][1][0]):
+                    continue
                 #print(region_height,region_width)
                 if(region_height>=char_dim[0] and region_height <=char_dim[1] and region_width>=char_dim[2] and region_width<= char_dim[3]):
                     rectBorder = patches.Rectangle((minCol, minRow), maxCol-minCol, maxRow-minRow, edgecolor="red", linewidth=2, fill=False)
@@ -81,28 +84,35 @@ class Preprocess():
                     temp_chars.append((minRow,maxRow,minCol,maxCol)) 
                     plotting.add_borders(rectBorder,self.fig,self.axis1)               
             
+            
             if(len(border)==10):               
                 for borders in border:
                     plotting.add_borders(borders,self.fig,self.axis1)                    
                 dim=self.lp_cand_dimension[idx]
                 
                 for val in temp_chars:
-                    r1=dim[0]+val[0]
-                    r2=dim[0]+val[1]
-                    c1=dim[1]+val[2]
-                    c2=dim[1]+val[3]
-
-                    segmented_characters.append(self.car_image[r1:r2,c1:c2])
+                    r1=dim[0][0]+val[0]
+                    r2=dim[0][0]+val[1]
+                    c1=dim[0][1]+val[2]
+                    c2=dim[0][1]+val[3]
+                    segmented_characters.append((val[2],resize(np.invert(self.binary_car_image[r1:r2,c1:c2]),(20,20))))
+        return segmented_characters
                     
         
         
 
 if __name__=="__main__":
-    env=Preprocess("test_image/car4.jpg")
+    env=Preprocess("test_image/car.jpg")
     env.plate_detection()
-    env.character_segmentation()
-    plotting.show()
+    segmented_characters=env.character_segmentation()
 
+    plotting.show()
+    fig,axis=plt.subplots(1,1)
+    axis.imshow(segmented_characters[0],cmap="gray")
+
+    plt.show()
+
+    
 
         
 
