@@ -9,7 +9,7 @@ import database
 model_pat=os.path.dirname(os.path.realpath(__file__))+"/model.sav"
 model= pickle.load(open(model_pat,"rb"))
 
-env=preprocess.Preprocess("test_image/car4.jpg")
+env=preprocess.Preprocess("test_image/car2.jpg")
 env.plate_detection()
 segmented_characters=env.character_segmentation()
 plotting.show()

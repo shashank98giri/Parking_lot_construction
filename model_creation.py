@@ -46,16 +46,12 @@ print(training_dataset_dir)
 image_data, target_data = read_training_data(training_dataset_dir)
 print('reading data completed')
 
-# the kernel can be 'linear', 'poly' or 'rbf'
-# the probability was set to True so as to show
-# how sure the model is of it's prediction
 svc_model = SVC(kernel='linear', probability=True)
 
 cross_validation(svc_model, 4, image_data, target_data)
 
 print('training model')
 
-# let's train the model with all the input data
 svc_model.fit(image_data, target_data)
 
 

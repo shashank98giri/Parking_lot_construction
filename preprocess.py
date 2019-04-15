@@ -66,7 +66,7 @@ class Preprocess():
         for idx in range(len(self.lp_cands)):
             cand=self.lp_cands[idx]
             plotting.plot_car_image(cand,self.fig,self.axis1)
-            char_dim = (0.35*cand.shape[0], 0.90*cand.shape[0], 0.02*cand.shape[1], 0.1*cand.shape[1])
+            char_dim = (0.30*cand.shape[0], 0.90*cand.shape[0], 0.02*cand.shape[1], 0.1*cand.shape[1])
             
             labelled_cand = measure.label(cand)
             cnt=0
@@ -102,15 +102,15 @@ class Preprocess():
         
 
 if __name__=="__main__":
-    env=Preprocess("test_image/car.jpg")
+    env=Preprocess("test_image/car4.jpg")
     env.plate_detection()
     segmented_characters=env.character_segmentation()
 
     plotting.show()
-    fig,axis=plt.subplots(1,1)
-    axis.imshow(segmented_characters[0],cmap="gray")
+    # fig,axis=plt.subplots(1,1)
+    # axis.imshow(segmented_characters[0],cmap="gray")
 
-    plt.show()
+    # plt.show()
 
     
 
